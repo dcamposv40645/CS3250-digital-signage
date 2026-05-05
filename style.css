@@ -1,0 +1,246 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+#app {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* ── LEFT PANEL ─────────────────────────────────────────────── */
+#infoPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  background: rgba(148, 163, 184, 0.2);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 16px;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+#infoPanel .infoCard {
+  flex-shrink: 0;
+}
+
+/* ── RIGHT PANEL ────────────────────────────────────────────── */
+#rightPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+}
+
+#feedPanel {
+  flex: 1;
+  background: rgba(148, 163, 184, 0.2);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 16px;
+  padding: 24px;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+#feedContent {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* ── BOTTOM ROW (3 boxes) ───────────────────────────────────── */
+#bottomRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  height: 220px;
+  flex-shrink: 0;
+}
+
+#cryptoContent,
+#harvardContent,
+#imageContent {
+  background: rgba(148, 163, 184, 0.2);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ── SHARED CARD STYLE ──────────────────────────────────────── */
+.panel {
+  background: rgba(148, 163, 184, 0.2);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 16px;
+  padding: 24px;
+  box-sizing: border-box;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.infoCard {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.infoCard h2 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+#clock {
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 0;
+  margin: 0;
+}
+
+#date {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #94a3b8;
+  display: block;
+  margin-top: 4px;
+}
+
+#weather {
+  flex-shrink: 0;
+}
+
+/* ── IMAGE ──────────────────────────────────────────────────── */
+.staticImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+}
+
+/* ── ARTICLE CARDS ──────────────────────────────────────────── */
+.article-feed {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.article-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 20px;
+}
+
+.article-source {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #00d4ff;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.article-date {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: normal;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.article-title {
+  font-size: clamp(1.4rem, 2.5vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 20px 0;
+  color: #f0f0f0;
+}
+
+.article-divider {
+  width: 50px;
+  height: 3px;
+  background: #00d4ff;
+  border-radius: 2px;
+  margin-bottom: 20px;
+}
+
+.article-desc {
+  font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+  line-height: 1.75;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.article-num {
+  margin-top: auto;
+  padding-top: 16px;
+  font-size: 12px;
+  color: #475569;
+  letter-spacing: 1px;
+}
+
+/* ── PORTRAIT ───────────────────────────────────────────────── */
+@media (orientation: portrait) {
+  #app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  #infoPanel {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: hidden;
+    padding: 12px;
+  }
+
+  #infoPanel .infoCard {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  #clock {
+    font-size: 1.6rem;
+  }
+
+  .infoCard h2 {
+    font-size: 0.9rem;
+  }
+
+  #bottomRow {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  #cryptoContent,
+  #harvardContent,
+  #imageContent {
+    height: 160px;
+  }
+
+  .article-title {
+    font-size: 1.3rem;
+  }
+}
