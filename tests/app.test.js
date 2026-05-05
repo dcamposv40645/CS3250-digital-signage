@@ -109,3 +109,41 @@ describe('parseConfig', () => {
         expect(parseConfig(config).staticRefreshTime).toBe(15);
     });
 });
+describe('buildRssHtml', () => {
+    test('returns error html when status is not ok', () => {
+        const html = buildRssHtml({ status: 'error', message: 'Forbidden' }, 5);
+        expect(html).toContain('Feed Unavailable');
+    });
+
+    test('returns error html when items is empty', () => {
+        const html = buildRssHtml({ status: 'ok', feed: { title: 'X' }, items: [] }, 5);
+        expect(html).toContain('Feed Unavailable');
+    });
+
+    test('first card is visible', () => {
+        const feed = { status: 'ok', feed: { title: 'HN' }, items: [
+            { title: 'Article 1', description: 'desc', pubDate: '2024-01-01' },
+            { title: 'Article 2', description: 'desc', pubDate: '2024-01-02' },
+        ]};
+        const html = buildRssHtml(feed, 5);
+        expect(html).toContain('display: flex');
+    });
+
+    test('respects maxItems limit', () => {
+        const feed = { status: 'ok', feed: { title: 'HN' }, items: [
+            { title: 'Article 1', description: 'desc', pubDate: null },
+            { title: 'Article 2', description: 'desc', pubDate: null },
+            { title: 'Article 3', description: 'desc', pubDate: null },
+        ]};
+        const html = buildRssHtml(feed, 2);
+        expect((html.match(/article-card/g) || []).length).toBe(2);
+    });
+
+    test('escapes dangerous characters in title', () => {
+        const feed = { status: 'ok', feed: { title: 'HN' }, items: [
+            { title: '<script>alert(1)</script>', description: '', pubDate: null },
+        ]};
+        const html = buildRssHtml(feed, 5);
+        expect(html).not.toContain('<script>');
+    });
+});
