@@ -1,0 +1,36 @@
+{
+  "name": "cs3250-digital-signage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint app.js app.module.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dcamposv40645/CS3250-digital-signage.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/dcamposv40645/CS3250-digital-signage/issues"
+  },
+  "homepage": "https://github.com/dcamposv40645/CS3250-digital-signage#readme",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.3.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
+  }
+}
