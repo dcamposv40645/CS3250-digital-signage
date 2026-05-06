@@ -19,6 +19,7 @@ module.exports = [
         module: 'readonly',
         require: 'readonly',
         Image : 'readonly',
+        requestAnimationFrame: 'readonly',
       },
     },
     rules: {
