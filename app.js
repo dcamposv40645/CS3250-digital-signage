@@ -26,8 +26,8 @@ async function loadConfig() {
     startStaticRefresh();
     startRssDisplay();
 
-  } catch (err) {
-    console.error("Failed to load config:", err);
+  } catch (_err) {
+    console.error('Failed to load config:', _err);
   }
 }
 
@@ -183,7 +183,7 @@ function escapeHtml(str) {
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+    .replaceAll('\'', '&#39;');
 }
 
 async function loadRss(url, maxItems = 5) {
@@ -295,8 +295,7 @@ async function loadHarvardArt(item) {
       <p style="font-size: 0.8rem; margin: 4px 0;"><strong>Artist:</strong> ${escapeHtml(record.people ? record.people.map(p => p.name).join(', ') : 'Unknown')}</p>
       <p style="font-size: 0.8rem; margin: 0;"><strong>Date:</strong> ${escapeHtml(record.dated || 'Unknown')}</p>
     `;
-  } catch (err) {
-    console.error('Harvard Art error:', err);
+  } catch {
     return '<p>Failed to load artwork.</p>';
   }
 }
@@ -321,7 +320,7 @@ async function renderStaticItems() {
         weatherItems.map((item) => loadWeather(item.URL, item.title || 'Denver Weather'))
       );
       weatherBox.innerHTML = markup.join('');
-    } catch (err) {
+    } catch {
       weatherBox.innerHTML = '<p>Weather unavailable.</p>';
     }
   }
@@ -342,7 +341,7 @@ async function renderStaticItems() {
       apiBox.innerHTML = cards.map(c =>
         c.replace('<div class="infoCard">', '').replace(/<\/div>\s*$/, '')
       ).join('');
-    } catch (err) {
+    } catch {
       apiBox.innerHTML = '<p>API data unavailable.</p>';
       apiBox.style.display = 'block';
     }
@@ -354,7 +353,7 @@ async function renderStaticItems() {
       const cards = await Promise.all(cryptoItems.map((item) => loadCryptoChart(item)));
       cryptoBox.style.display = 'block';
       cryptoBox.innerHTML = cards.join('');
-    } catch (err) {
+    } catch {
       cryptoBox.innerHTML = '<p>Crypto data unavailable.</p>';
       cryptoBox.style.display = 'block';
     }
@@ -366,7 +365,7 @@ async function renderStaticItems() {
       const cards = await Promise.all(harvardItems.map((item) => loadHarvardArt(item)));
       harvardBox.style.display = 'block';
       harvardBox.innerHTML = cards.join('');
-    } catch (err) {
+    } catch {
       harvardBox.innerHTML = '<p>Harvard Art unavailable.</p>';
       harvardBox.style.display = 'block';
     }
@@ -390,8 +389,7 @@ async function showRssItem() {
   try {
     feedContent.innerHTML = await loadRss(item.URL, item.maxItems || 5);
     articleTimer = setTimeout(cycleArticles, cycleTime * 1000);
-  } catch (err) {
-    console.error('Failed to load RSS feed:', err);
+  } catch {
     feedContent.innerHTML = `
       <div>
         <h1>Feed Unavailable</h1>
