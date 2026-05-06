@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1778039362109" clover="3.2.0">
+  <project timestamp="1778039362109" name="All files">
+    <metrics statements="39" coveredstatements="39" conditionals="59" coveredconditionals="59" methods="12" coveredmethods="12" elements="110" coveredelements="110" complexity="0" loc="39" ncloc="39" packages="1" files="1" classes="1"/>
+    <file name="app.module.js" path="/Users/danielcampos/Documents/CS3250-digital-signage/app.module.js">
+      <metrics statements="39" coveredstatements="39" conditionals="59" coveredconditionals="59" methods="12" coveredmethods="12"/>
+      <line num="4" count="20" type="stmt"/>
+      <line num="13" count="12" type="cond" truecount="2" falsecount="0"/>
+      <line num="14" count="11" type="cond" truecount="2" falsecount="0"/>
+      <line num="15" count="10" type="cond" truecount="2" falsecount="0"/>
+      <line num="16" count="9" type="cond" truecount="2" falsecount="0"/>
+      <line num="17" count="8" type="cond" truecount="4" falsecount="0"/>
+      <line num="18" count="7" type="cond" truecount="4" falsecount="0"/>
+      <line num="19" count="6" type="cond" truecount="4" falsecount="0"/>
+      <line num="20" count="5" type="cond" truecount="4" falsecount="0"/>
+      <line num="21" count="4" type="cond" truecount="4" falsecount="0"/>
+      <line num="22" count="3" type="cond" truecount="4" falsecount="0"/>
+      <line num="23" count="2" type="cond" truecount="4" falsecount="0"/>
+      <line num="24" count="1" type="stmt"/>
+      <line num="28" count="5" type="stmt"/>
+      <line num="29" count="8" type="cond" truecount="4" falsecount="0"/>
+      <line num="35" count="9" type="stmt"/>
+      <line num="36" count="9" type="stmt"/>
+      <line num="37" count="9" type="cond" truecount="3" falsecount="0"/>
+      <line num="41" count="5" type="stmt"/>
+      <line num="42" count="5" type="stmt"/>
+      <line num="43" count="8" type="stmt"/>
+      <line num="44" count="8" type="stmt"/>
+      <line num="46" count="5" type="stmt"/>
+      <line num="47" count="6" type="stmt"/>
+      <line num="48" count="6" type="cond" truecount="2" falsecount="0"/>
+      <line num="49" count="5" type="cond" truecount="2" falsecount="0"/>
+      <line num="51" count="5" type="stmt"/>
+      <line num="55" count="5" type="cond" truecount="4" falsecount="0"/>
+      <line num="56" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="59" count="3" type="stmt"/>
+      <line num="60" count="3" type="stmt"/>
+      <line num="62" count="3" type="stmt"/>
+      <line num="63" count="5" type="stmt"/>
+      <line num="67" count="5" type="cond" truecount="2" falsecount="0"/>
+      <line num="70" count="5" type="cond" truecount="2" falsecount="0"/>
+      <line num="74" count="5" type="stmt"/>
+      <line num="85" count="3" type="stmt"/>
+      <line num="86" count="3" type="stmt"/>
+      <line num="89" count="1" type="stmt"/>
+    </file>
+  </project>
+</coverage>

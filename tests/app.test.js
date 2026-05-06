@@ -39,6 +39,32 @@ describe('getWeatherSymbol', () => {
     test('unknown code returns fallback', () => {
         expect(getWeatherSymbol(999)).toBe('🌡️ Unknown');
     });
+    test('code 51 returns drizzle', () => {
+        expect(getWeatherSymbol(51)).toBe('🌦️ Drizzle');
+    });
+
+    test('code 61 returns rainy', () => {
+        expect(getWeatherSymbol(61)).toBe('🌧️ Rainy');
+    });
+
+    test('code 71 returns snowy', () => {
+        expect(getWeatherSymbol(71)).toBe('❄️ Snowy');
+    });
+
+    test('code 80 returns showers', () => {
+        expect(getWeatherSymbol(80)).toBe('🌧️ Showers');
+    });
+
+    test('code 85 returns snow showers', () => {
+        expect(getWeatherSymbol(85)).toBe('🌨️ Snow Showers');
+    });
+
+    test('code 95 returns thunderstorm', () => {
+        expect(getWeatherSymbol(95)).toBe('⛈️ Thunderstorm');
+    });
+    test('code 2 returns partly cloudy', () => {
+        expect(getWeatherSymbol(2)).toBe('⛅️ Partly Cloudy');
+    });
 });
 describe('getValuePath', () => {
     test('returns top level value', () => {
@@ -121,28 +147,34 @@ describe('buildRssHtml', () => {
     });
 
     test('first card is visible', () => {
-        const feed = { status: 'ok', feed: { title: 'HN' }, items: [
-            { title: 'Article 1', description: 'desc', pubDate: '2024-01-01' },
-            { title: 'Article 2', description: 'desc', pubDate: '2024-01-02' },
-        ]};
+        const feed = {
+            status: 'ok', feed: { title: 'HN' }, items: [
+                { title: 'Article 1', description: 'desc', pubDate: '2024-01-01' },
+                { title: 'Article 2', description: 'desc', pubDate: '2024-01-02' },
+            ]
+        };
         const html = buildRssHtml(feed, 5);
         expect(html).toContain('display: flex');
     });
 
     test('respects maxItems limit', () => {
-        const feed = { status: 'ok', feed: { title: 'HN' }, items: [
-            { title: 'Article 1', description: 'desc', pubDate: null },
-            { title: 'Article 2', description: 'desc', pubDate: null },
-            { title: 'Article 3', description: 'desc', pubDate: null },
-        ]};
+        const feed = {
+            status: 'ok', feed: { title: 'HN' }, items: [
+                { title: 'Article 1', description: 'desc', pubDate: null },
+                { title: 'Article 2', description: 'desc', pubDate: null },
+                { title: 'Article 3', description: 'desc', pubDate: null },
+            ]
+        };
         const html = buildRssHtml(feed, 2);
         expect((html.match(/article-card/g) || []).length).toBe(2);
     });
 
     test('escapes dangerous characters in title', () => {
-        const feed = { status: 'ok', feed: { title: 'HN' }, items: [
-            { title: '<script>alert(1)</script>', description: '', pubDate: null },
-        ]};
+        const feed = {
+            status: 'ok', feed: { title: 'HN' }, items: [
+                { title: '<script>alert(1)</script>', description: '', pubDate: null },
+            ]
+        };
         const html = buildRssHtml(feed, 5);
         expect(html).not.toContain('<script>');
     });
