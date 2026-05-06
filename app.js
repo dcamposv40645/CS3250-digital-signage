@@ -23,7 +23,11 @@ async function loadConfig() {
 
     startClock();
     await renderStaticItems();
+    await renderCrypto();
+    await renderChicagoArt();
     startStaticRefresh();
+    startCryptoRefresh();
+    startChicagoArtRefresh();
     startRssDisplay();
 
   } catch (_err) {
@@ -35,6 +39,53 @@ function startStaticRefresh() {
   setInterval(() => {
     renderStaticItems();
   }, staticRefreshTime * 1000);
+}
+
+async function renderCrypto() {
+  const cryptoItems = staticItems.filter((item) => item.type === 'Crypto');
+  if (!cryptoItems.length) return;
+
+  const boxMap = {
+    'bitcoin':  'bitcoinContent',
+    'ethereum': 'ethereumContent',
+    'dogecoin': 'dogecoinContent',
+  };
+
+  for (const item of cryptoItems) {
+    const boxId = boxMap[item.cryptoId] || 'bitcoinContent';
+    const box = document.getElementById(boxId);
+    if (!box) continue;
+
+    try {
+      box.style.display = 'block';
+      box.innerHTML = await loadCryptoChart(item);
+    } catch {
+      box.innerHTML = '<p>Crypto data unavailable.</p>';
+      box.style.display = 'block';
+    }
+  }
+}
+
+function startCryptoRefresh() {
+  setInterval(renderCrypto, 60 * 60 * 1000);
+}
+
+async function renderChicagoArt() {
+  const chicagoArtBox   = document.getElementById('chicagoArtContent');
+  const chicagoArtItems = staticItems.filter((item) => item.type === 'ChicagoArt');
+  if (!chicagoArtBox || !chicagoArtItems.length) return;
+
+  try {
+    const cards = await Promise.all(chicagoArtItems.map(() => loadChicagoArt()));
+    chicagoArtBox.style.display = 'block';
+    chicagoArtBox.innerHTML = cards.join('');
+  } catch {
+    chicagoArtBox.style.display = 'none';
+  }
+}
+
+function startChicagoArtRefresh() {
+  setInterval(renderChicagoArt, 1 * 60 * 1000);
 }
 
 function startRssDisplay() {
@@ -128,7 +179,9 @@ async function loadCryptoChart(item) {
   const url = `https://api.coingecko.com/api/v3/coins/${item.cryptoId}/market_chart?vs_currency=${item.vs_currency || 'usd'}&days=${item.days || 7}`;
 
   const res = await fetch(url);
+  if (!res.ok) throw new Error(`CoinGecko error: ${res.status}`);
   const data = await res.json();
+  if (!data.prices) throw new Error('No price data in response');
 
   const prices = data.prices.map(([timestamp, price]) => ({
     time: new Date(timestamp).toLocaleDateString(),
@@ -138,9 +191,9 @@ async function loadCryptoChart(item) {
   const chartId = `cryptoChart_${item.cryptoId}`;
 
   const html = `
-    <div style="width: 100%; height: 100%;">
-      <h2 style="margin: 0 0 8px 0;">${escapeHtml(item.title)}</h2>
-      <canvas id="${chartId}"></canvas>
+    <div class="cryptoCard">
+      <h3 style="margin:0 0 6px 0; font-size:0.95rem;">${escapeHtml(item.title)}</h3>
+      <div class="chartWrapper"><canvas id="${chartId}"></canvas></div>
     </div>
   `;
 
@@ -154,8 +207,8 @@ async function loadCryptoChart(item) {
           datasets: [{
             label: item.title,
             data: prices.map(p => parseFloat(p.price)),
-            borderColor: '#6bff6b',
-            backgroundColor: 'rgba(107, 255, 107, 0.1)',
+            borderColor: item.color || '#6bff6b',
+            backgroundColor: (item.color || '#6bff6b') + '1a',
             tension: 0.4,
             fill: true
           }]
@@ -267,53 +320,66 @@ async function loadApiCard(item) {
   `;
 }
 
-async function loadHarvardArt(item) {
+function probeImages(candidates, timeoutMs = 6000) {
+  return new Promise((resolve) => {
+    if (!candidates.length) { resolve(null); return; }
+
+    let failed = 0;
+    const timer = setTimeout(() => resolve(null), timeoutMs);
+
+    candidates.forEach(({ url, title }) => {
+      const img = new Image();
+      img.onload = () => {
+        clearTimeout(timer);
+        resolve({ url, title });
+      };
+      img.onerror = () => {
+        if (++failed === candidates.length) {
+          clearTimeout(timer);
+          resolve(null);
+        }
+      };
+      img.src = url;
+    });
+  });
+}
+
+async function loadChicagoArt() {
   try {
-    const url = `https://api.harvardartmuseums.org/object?apikey=${item.apiKey}&size=1&sort=random&hasImages=1`;
+    const page = Math.floor(Math.random() * 1200) + 1;
+    const url = `https://api.artic.edu/api/v1/artworks?fields=id,title,image_id&limit=10&page=${page}`;
     const res = await fetch(url);
+    if (!res.ok) throw new Error(`AIC error: ${res.status}`);
     const data = await res.json();
 
-    if (!data.records || data.records.length === 0) {
-      return '<p>No artworks found.</p>';
-    }
+    if (!data.data || !data.data.length) return '';
 
-    const record = data.records[0];
-    let imageHtml = '';
+    const candidates = data.data
+      .filter((record) => record.image_id)
+      .map((record) => ({
+        url: `https://www.artic.edu/iiif/2/${record.image_id}/full/843,/0/default.jpg`,
+        title: record.title || ''
+      }));
 
-    if (record.images && record.images.length > 0) {
-      const img = record.images[0];
-      if (img.iiifbaseuri) {
-        const imageUrl = `${img.iiifbaseuri}/full/400,/0/default.jpg`;
-        imageHtml = `<img src="${imageUrl}" alt="${escapeHtml(record.title)}" style="max-width: 100%; max-height: 100px; object-fit: cover; border-radius: 8px; margin: 8px 0;">`;
-      }
-    }
+    const winner = await probeImages(candidates);
+    if (!winner) return '';
 
-    return `
-      <h2 style="margin: 0 0 6px 0;">Harvard Art</h2>
-      <p style="font-size: 0.85rem; font-weight: 600; margin: 0 0 4px 0;">${escapeHtml(record.title || 'Untitled')}</p>
-      ${imageHtml}
-      <p style="font-size: 0.8rem; margin: 4px 0;"><strong>Artist:</strong> ${escapeHtml(record.people ? record.people.map(p => p.name).join(', ') : 'Unknown')}</p>
-      <p style="font-size: 0.8rem; margin: 0;"><strong>Date:</strong> ${escapeHtml(record.dated || 'Unknown')}</p>
-    `;
-  } catch {
-    return '<p>Failed to load artwork.</p>';
+    return `<img src="${winner.url}" alt="${escapeHtml(winner.title)}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;display:block;">`;
+  } catch (_err) {
+    console.error('Chicago Art error:', _err);
+    return '';
   }
 }
 
 async function renderStaticItems() {
-  const weatherBox   = document.getElementById('weather');
-  const imageBox     = document.getElementById('imageContent');
-  const apiBox       = document.getElementById('apiContent');
-  const cryptoBox    = document.getElementById('cryptoContent');
-  const harvardBox   = document.getElementById('harvardContent');
+  const weatherBox = document.getElementById('weather');
+  const imageBox   = document.getElementById('imageContent');
+  const apiBox     = document.getElementById('apiContent');
 
   const weatherItems = staticItems.filter((item) => item.type === 'Weather');
   const imageItems   = staticItems.filter((item) => item.type === 'Image');
   const apiItems     = staticItems.filter((item) => item.type === 'API');
-  const cryptoItems  = staticItems.filter((item) => item.type === 'Crypto');
-  const harvardItems = staticItems.filter((item) => item.type === 'Harvard');
 
-  // Weather
   if (weatherItems.length) {
     try {
       const markup = await Promise.all(
@@ -325,7 +391,6 @@ async function renderStaticItems() {
     }
   }
 
-  // Image
   if (imageItems.length) {
     imageBox.style.display = 'block';
     imageBox.innerHTML = imageItems.map((item) =>
@@ -333,7 +398,6 @@ async function renderStaticItems() {
     ).join('');
   }
 
-  // API
   if (apiItems.length) {
     try {
       const cards = await Promise.all(apiItems.map((item) => loadApiCard(item)));
@@ -344,30 +408,6 @@ async function renderStaticItems() {
     } catch {
       apiBox.innerHTML = '<p>API data unavailable.</p>';
       apiBox.style.display = 'block';
-    }
-  }
-
-  // Crypto
-  if (cryptoItems.length) {
-    try {
-      const cards = await Promise.all(cryptoItems.map((item) => loadCryptoChart(item)));
-      cryptoBox.style.display = 'block';
-      cryptoBox.innerHTML = cards.join('');
-    } catch {
-      cryptoBox.innerHTML = '<p>Crypto data unavailable.</p>';
-      cryptoBox.style.display = 'block';
-    }
-  }
-
-  // Harvard Art
-  if (harvardItems.length) {
-    try {
-      const cards = await Promise.all(harvardItems.map((item) => loadHarvardArt(item)));
-      harvardBox.style.display = 'block';
-      harvardBox.innerHTML = cards.join('');
-    } catch {
-      harvardBox.innerHTML = '<p>Harvard Art unavailable.</p>';
-      harvardBox.style.display = 'block';
     }
   }
 }
@@ -389,7 +429,8 @@ async function showRssItem() {
   try {
     feedContent.innerHTML = await loadRss(item.URL, item.maxItems || 5);
     articleTimer = setTimeout(cycleArticles, cycleTime * 1000);
-  } catch {
+  } catch (_err) {
+    console.error('Failed to load RSS feed:', _err);
     feedContent.innerHTML = `
       <div>
         <h1>Feed Unavailable</h1>

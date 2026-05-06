@@ -18,6 +18,7 @@ module.exports = [
         console: 'readonly',
         module: 'readonly',
         require: 'readonly',
+        Image : 'readonly',
       },
     },
     rules: {
